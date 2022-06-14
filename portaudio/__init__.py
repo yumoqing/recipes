@@ -34,7 +34,7 @@ class PARecipe(NDKRecipe):
 			env = self.get_recipe_env(arch)
 			python_major = self.ctx.python_recipe.version[0]
 			python_include_root = self.ctx.python_recipe.include_root(arch.arch)
-			python_site_packages = self.ctx.get_site_packages_dir()
+			python_site_packages = self.ctx.get_site_packages_dir(arch)
 			python_link_root = self.ctx.python_recipe.link_root(arch.arch)
 			python_link_version = self.ctx.python_recipe.major_minor_version_string
 			if 'python3' in self.ctx.python_recipe.name:
