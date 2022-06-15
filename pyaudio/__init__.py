@@ -16,11 +16,12 @@ class PyaudioRecipe(CompiledComponentsPythonRecipe):
 
 	def get_recipe_env(self, arch):
 		env = super().get_recipe_env(arch)
-		curdir = os.path.abspath(os.path.dirname(__file__))
+		# curdir = os.path.abspath(os.path.dirname(__file__))
 		portaudio_include = join(self.get_recipe('portaudio', self.ctx).get_build_dir(arch.arch), 'include')
 		py_include = join(self.ctx.get_python_install_dir(arch.arch), 'include')
 		sqlit_include = self.get_recipe('sqlite3', self.ctx).get_build_dir(arch.arch) 
-		env['CFLAGS'] += f' -I{curdir} -I{py_include} -I{sqlit_include} -I{portaudio_include} '
+		# env['CFLAGS'] += f' -I{curdir} -I{py_include} -I{sqlit_include} -I{portaudio_include} '
+		env['CFLAGS'] += f' -I{py_include} -I{sqlit_include} -I{portaudio_include} '
 		shprint(sh.echo, env['CFLAGS'])
 		return env
 
@@ -33,8 +34,15 @@ class PyaudioRecipe(CompiledComponentsPythonRecipe):
 
 		with current_directory(self.get_build_dir(arch.arch)):
 			hostpython = sh.Command(self.ctx.hostpython)
-			info('hostpython={}'.format(hostpython))
-			shprint(hostpython, 'setup.py', 'install', '-O2', _env=env)
+			info('hostpython={}, target={}'.format(hostpython,
+				self.ctx.get_python_install_dir(arch.arch),
+			))
+			shprint(hostpython, 
+				'setup.py', 
+				'install', 
+				'-O2', 
+				'--root={}'.format(self.ctx.get_python_install_dir(arch.arch)),
+				_env=env)
 
 	def build_arch(self, arch):
 		super().build_arch(arch)
