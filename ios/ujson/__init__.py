@@ -2,14 +2,14 @@ import os
 import sh
 from os.path import join
 import fnmatch
-from kivy_ios.toolchain import PythonRecipe, shprint
+from kivy_ios.toolchain import Recipe, shprint
 import logging
 logger = logging.getLogger(__name__)
 
-class UJsonRecipe(PythonRecipe):
+class UJsonRecipe(Recipe):
 	version = "4.0.0"
 	url = 'https://files.pythonhosted.org/packages/93/f1/b57ed26d5a971a41e18def43cecdfc36440e5aea13b379556f233b4757ac/ujson-4.0.0.tar.gz'
-	depends = ["python", "setuptools" ]
+	depends = []
 
 	def env_min(self, env, arch):
 		if arch.arch == 'x86_64':
@@ -35,6 +35,7 @@ class UJsonRecipe(PythonRecipe):
 
 	def build_arch(self, arch):
 		build_env = self.get_ujson_env(arch)
+		self.ctx.hostpython = join(self.ctx.dist_dir, "hostpython3", "bin", "python")
 		hostpython3 = sh.Command(self.ctx.hostpython)
 		dest_dir = os.path.join(self.ctx.dist_dir, "root", "python3")
 		logger.info('+++++++++++++++++BUILD_ARCH+++++++++++++++++++++')

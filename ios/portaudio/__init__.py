@@ -9,8 +9,8 @@ class PortaudioRecipe(Recipe):
 	'''
 	test recipe
 	'''
-	version = '2.0'
-	url = 'https://github.com/yumoqing/portaudio/archive/master.zip'
+	version = '19.7.0'
+	url = 'http://files.portaudio.com/archives/pa_stable_v190700_20210406.tgz'
 	patches = []
 	library = "libportaudio.a"
 	# include_per_arch = True
