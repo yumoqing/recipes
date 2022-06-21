@@ -51,7 +51,7 @@ class UJsonRecipe(PythonRecipe):
 		hostpython3 = sh.Command(self.ctx.hostpython)
 		build_env = self.get_ujson_env(arch)
 		dest_dir = join(self.ctx.dist_dir, "root", "python3")
-		build_env['PYTHONPATH'] = join(dest_dir, 'lib', 'python3.8', 'site-packages')
+		build_env['PYTHONPATH'] = join(dest_dir, 'lib', 'python3.9', 'site-packages')
 		dest_dir = os.path.join(self.ctx.dist_dir, "root", "python3")
 		logger.info('+++++++++++++++++INSTALL+++++++++++++++++++++')
 		logger.info('arch={},build_env={}'.format(arch.arch, build_env))
