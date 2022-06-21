@@ -1,0 +1,74 @@
+#!/Users/ymq/bin/python
+import os
+import sys
+import codecs
+import json
+from pathlib import Path
+import sh
+import shutil
+
+recipe_pattern="""
+from kivy_ios.toolchain import PythonRecipe
+class %(name)sRecipe(PythonRecipe):
+   version = "%(version)s"
+   url = "%(url)s"
+   depends = ["python"]
+
+recipe = %(name)sRecipe()
+"""
+class PythonRecipeCreator:
+	def __init__(self, name, version, url):
+		self.name = name
+		self.version = version
+		self.url = url
+		self.env = {}
+
+	def run(self):
+		self.load_env()
+		self.gen_recipe_folder()
+
+	def load_env(self):
+		home = str(Path.home())
+		fp = os.path.join(home, '.iospr.json')
+		# if Path(fp).is_file():
+		if os.path.isfile(fp):
+			with codecs.open(fp, 'r', 'utf-8') as f:
+				d = json.load(f)
+				self.env = d
+			print(self.env)
+			return 
+		print(f'~/.iospr.json {fp} not found')
+
+	def gen_recipe_file(self, folder):
+		fp = os.path.join(folder, '__init__.py')
+		recipe = recipe_pattern % {
+			'name':self.name,
+			'version':self.version,
+			'url':self.url
+		}
+		with codecs.open(fp, 'w', 'utf-8') as f:
+			f.write(recipe)
+
+	def gen_recipe_folder(self):
+		rfp = os.path.join(self.env['LOCAL_RECIPES_PATH'], self.name)
+		rrfp = os.path.join(self.env['IOS_RECIPES_PATH'], self.name)
+		try:
+			sh.mkdir(rfp)
+		except:
+			pass
+		try:
+			sh.ln('-s', rfp, rrfp)
+		except:
+			pass
+		self.gen_recipe_file(rfp)
+
+if __name__ == '__main__':
+	if len(sys.argv) < 4:
+		print('''
+Auto generate recipe file for pure python module.
+Usage:\n%s name version url
+		''' % sys.argv[0])
+		sys.exit(1)
+	prc = PythonRecipeCreator(sys.argv[1], sys.argv[2], sys.argv[3])
+	prc.run()
+
