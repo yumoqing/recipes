@@ -11,14 +11,16 @@ recipe_pattern="""
 from kivy_ios.toolchain import PythonRecipe
 from kivy_ios.recipes.pypi_info import get_version_url
 class TmpRecipe(PythonRecipe):
-   version, url = get_version_url('%(name)s')
+   version, url = get_version_url('%(name)s', version='%(version)s')
    depends = ["python"]
 
 recipe = TmpRecipe()
 """
 class PythonRecipeCreator:
 	def __init__(self, name, folder=None):
-		self.name = name
+		b = name.split('==', 1)
+		self.name = b[0]
+		self.version = '' if len(b) == 1 else b[1]
 		self.folder = folder if folder else self.name
 		self.env = {}
 
@@ -41,7 +43,8 @@ class PythonRecipeCreator:
 	def gen_recipe_file(self, folder):
 		fp = os.path.join(folder, '__init__.py')
 		recipe = recipe_pattern % {
-			'name':self.name
+			'name':self.name,
+			'version':self.version
 		}
 		with codecs.open(fp, 'w', 'utf-8') as f:
 			f.write(recipe)

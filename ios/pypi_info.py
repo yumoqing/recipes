@@ -12,7 +12,7 @@ def get_pypi_info_json(module_name):
 	
 def get_version_url(module_name, version=None):
 	dic = get_pypi_info_json(module_name)
-	if version is None:
+	if version is None or version == '':
 		version = dic['info']['version']
 	url = None
 	for r in dic['releases'][version]:

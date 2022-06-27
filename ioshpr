@@ -17,7 +17,7 @@ import sh
 
 class TempRecipe(HostRecipe):
 	depends = ["openssl", "hostpython3", "python3", "host_setuptools3"]
-	version, url = get_version_url('%(name)s')
+	version, url = get_version_url('%(name)s', version='%(version)s')
 
 	def get_recipe_env(self, arch):
 		env = super().get_recipe_env(arch)
@@ -41,7 +41,9 @@ recipe = TempRecipe()
 """
 class PythonRecipeCreator:
 	def __init__(self, name, folder=None):
-		self.name = name
+		b = name.split('==', 1)
+		self.name = b[0]
+		self.version = '' if len(b) == 1 else b[1]
 		self.folder = folder if folder else self.name
 		self.env = {}
 
@@ -64,6 +66,7 @@ class PythonRecipeCreator:
 	def gen_recipe_file(self, folder):
 		fp = os.path.join(folder, '__init__.py')
 		recipe = recipe_pattern % {
+			'version':self.version,
 			'name':self.name
 		}
 		with codecs.open(fp, 'w', 'utf-8') as f:
