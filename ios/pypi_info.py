@@ -21,3 +21,15 @@ def get_version_url(module_name, version=None):
 			break
 	return version, url
 
+if __name__ == '__main__':
+	import sys
+
+	if len(sys.argv) < 2:
+		print(f'Usage\n{sys.argv[0]} module_name [version]')
+		sys.exit(1)
+
+	version = ''
+	if len(sys.argv) > 2:
+		version = sys.argv[2]
+	version, url = get_version_url(sys.argv[1], version=version)
+	print(f'{sys.argv[1]} {version} url={url}')
