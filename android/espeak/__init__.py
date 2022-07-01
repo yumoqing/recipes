@@ -12,7 +12,7 @@ class PARecipe(NDKRecipe):
 	'''
 	version = '1.48.04'
 	url = 'http://sourceforge.net/projects/espeak/files/espeak/espeak-1.48/espeak-1.48.04-source.zip'
-	depends = []
+	depends = ['portaudio']
 	patches = []
 	generated_libraries = [
 		'libespek.so'
@@ -22,14 +22,18 @@ class PARecipe(NDKRecipe):
 
 	def get_recipe_env(self, arch):
 		env = super().get_recipe_env(arch)
+		par = self.get_recipe('portaudio', self.ctx)
+		pa = par.get_build_dir(arch.arch)
+		portaudio_include = join(pa, 'include')
+		portaudio_lib = pa
 		env['ANDROID_NDK'] = self.ctx.ndk_dir
 		env['ANDROID_SDK'] = self.ctx.sdk_dir
+		env['CXXFLAGS'] += f' -I{portaudio_include}'
+		env['LDFLAGS'] += f' -L{portaudio_lib}'
 		return env
 
 	def build_arch(self, arch):
-		build_dir = join(self.get_build_dir(arch.arch), 'build')
-		shprint(sh.mkdir, '-p', build_dir)
-
+		build_dir = join(self.get_build_dir(arch.arch), 'src')
 		with current_directory(build_dir):
 			env = self.get_recipe_env(arch)
 			python_major = self.ctx.python_recipe.version[0]
@@ -42,27 +46,12 @@ class PARecipe(NDKRecipe):
 			python_library = join(python_link_root,
 								  'libpython{}.so'.format(python_link_version))
 
-			shprint(sh.cmake,
-					'-DP4A=ON',
-					'-DANDROID_ABI={}'.format(arch.arch),
-					'-DANDROID_STANDALONE_TOOLCHAIN={}'.format(self.ctx.ndk_dir),
-					'-DANDROID_NATIVE_API_LEVEL={}'.format(self.ctx.ndk_api),
-					'-DANDROID_EXECUTABLE={}/tools/android'.format(env['ANDROID_SDK']),
-
-					'-DCMAKE_TOOLCHAIN_FILE={}'.format(
-						join(self.ctx.ndk_dir, 'build', 'cmake',
-							 'android.toolchain.cmake')),
-					# Force to build as shared libraries the cv2's dependant
-					# libs or we will not be able to link with our python
-					'-DBUILD_SHARED_LIBS=ON',
-					'-DCMAKE_SHARED_LINKER_FLAGS=-L%s' % abspath(dirname(__file__)) ,
-					'-DBUILD_STATIC_LIBS=OFF',
-					self.get_build_dir(arch.arch),
-					_env=env)
-			shprint(sh.make)
+			shprint(sh.make, env=env)
 			# Install python bindings (cv2.so)
 			sh.cp(sh.glob('./lib*.so'),
 				  self.ctx.get_libs_dir(arch.arch))
+			sh.cp(sh.glob('../espeak-data/*'),
+					self.ctx.get_libs_dir(arch.arch))
 
 
 recipe = PARecipe()
