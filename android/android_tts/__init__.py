@@ -6,11 +6,11 @@ from os.path import join
 
 from pythonforandroid.recipe import PythonRecipe
 
-class Pyttsx3Recipe(PythonRecipe):
-	version = '2.92'
-	url = 'http://kimird.com/pymodules/pyttsx3_android-2.92.tar.gz'
-	depends = ['python3']
-	site_packages_name = 'pyttsx3'
+class ARecipe(PythonRecipe):
+	version = '5.1.16'
+	url = 'http://kimird.com/pymodules/android_tts-0.0.1.tar.gz'
+	depends = ['python3', 'pyttsx3']
+	site_packages_name = 'android_tts'
 	call_hostpython_via_targetpython = False
 
-recipe = Pyttsx3Recipe()
+recipe = ARecipe()
