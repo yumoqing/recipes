@@ -7,7 +7,7 @@ from os.path import join
 from pythonforandroid.recipe import PythonRecipe
 
 class ARecipe(PythonRecipe):
-	version = '5.1.16'
+	version = '0.0.1'
 	url = 'http://kimird.com/pymodules/android_tts-0.0.1.tar.gz'
 	depends = ['python3', 'pyttsx3']
 	site_packages_name = 'android_tts'
