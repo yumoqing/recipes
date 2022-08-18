@@ -1,0 +1,1 @@
+../ios/pypi_info.py
